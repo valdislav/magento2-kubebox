@@ -5,10 +5,10 @@ metadata:
   name: default-sources-volume
 spec:
   capacity:
-    storage: 2Gi
+    storage: 10Gi
   accessModes:
   - ReadWriteMany
-  storageClassName: standard
+  storageClassName: slow
   nfs:
     # The address 192.168.99.1 is the Minikube gateway to the host. This way
     # not the container IP will be visible by the NFS server on the host machine,

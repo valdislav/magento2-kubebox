@@ -23,9 +23,16 @@ data:
     events {
     }
     http {
+      include mime.types;
+            default_type application/octet-stream;
+            sendfile on;
+            keepalive_timeout 65;
       upstream fastcgi_backend {
         server 127.0.0.1:9000;
       }
+      rewrite_log on;
+      log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer"';
 
       server {
         listen 80 default_server;
@@ -34,7 +41,7 @@ data:
         server_name _;
 
         set $MAGE_ROOT /var/www/html/checkout;
-        include /var/www/html/checkout/nginx.conf.sample;
+        include /var/www/html/checkout-nginx.conf;
       }
     }
 ---
@@ -65,20 +72,23 @@ spec:
         ports:
         - containerPort: 80
         volumeMounts:
-        - name: code
+        - name: code-checkout
           mountPath: /var/www/html
       - name: nginx
         image: nginx:1.9
         volumeMounts:
-        - name: code
+        - name: code-checkout
           mountPath: /var/www/html
         - name: nginx-config-checkout-volume
           mountPath: /etc/nginx/nginx.conf
           subPath: nginx.conf
       volumes:
-      - name: code
-        hostPath:
-          path: {{PWD}}/sources
+      - name: code-checkout
+        persistentVolumeClaim:
+          claimName: sources-volume-claim
+#      - name: code-checkout
+#        hostPath:
+#          path: {{PWD}}/sources
       - name: nginx-config-checkout-volume
         configMap:
           name: nginx-config-checkout

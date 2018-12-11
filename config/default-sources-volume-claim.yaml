@@ -5,7 +5,8 @@ metadata:
   name: sources-volume-claim
   namespace: default
 spec:
-  storageClassName: standard
+  storageClassName: slow
+  volumeName: default-sources-volume
   accessModes:
   - ReadWriteMany
   resources:
